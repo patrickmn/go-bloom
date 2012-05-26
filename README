@@ -1,0 +1,63 @@
+go-bloom is a collection of bloom filters for Go, including a standard bloom
+filter, a counting bloom filter, and a layered bloom filter (for counting
+occurrences of the same item.)
+
+All of the bloom filters use the 64-bit FNV-1a hash function.
+
+To use go-bloom in multiple goroutines, use a sync.RWMutex, and surround test
+calls with RLock()/RUnlock(), and set calls with Lock()/()Unlock.
+
+== Installation
+
+go get github.com/pmylund/go-bloom
+
+== Usage
+
+import "github.com/pmylund/go-bloom"
+
+// Normal bloom filter
+
+// Create a bloom filter which will contain an expected 100,000 items, and which
+// allows a false positive rate of 1%.
+f := bloom.New(100000, 0.01)
+
+// Add an item to the filter
+f.Add([]byte("foo"))
+
+// Check if an item has been added to the filter (if true, subject to the
+// false positive chance; if false, then the item definitely has not been
+// added to the filter.
+f.Test([]byte("foo"))
+
+
+// Counting bloom filter
+
+// Create a counting bloom filter which will contain an expected 100,000 items,
+// and which allows a false positive rate of 1%.
+f := bloom.NewCounting(100000, 0.01)
+
+// Add an item to the counting filter
+f.Add([]byte("foo"))
+
+// Remove an item from the counting filter
+f.Remove([]byte("foo"))
+
+
+// Layered bloom filter
+
+// Create a layered bloom filter which will contain 3 layers of 100,000 items,
+// and which allows a false positive rate of 1%.
+f := bloom.NewLayered(3, 100000, 0.01)
+
+// Add an item to the layered filter
+f.Add([]byte("foo"))
+
+// Add an item to the layered filter again
+f.Add([]byte("foo"))
+
+// Find the index of the deepest layer an item was added to, e.g. 1 for the
+// second layer.
+layer, found := f.Test([]byte("foo")
+layer == 1
+
+go-bloom is blased on bloom by William Fitzgerald.
