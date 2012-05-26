@@ -62,7 +62,7 @@ f.Add([]byte("foo"))
 // Add an item to the layered filter again
 f.Add([]byte("foo"))
 
-// Find out how many times an item appears in the bitset
+// Find out how many times an item appears in the layered filter
 count := f.Test([]byte("foo")
 count == 2
 
