@@ -46,9 +46,9 @@ f.Remove([]byte("foo"))
 
 // Layered bloom filter
 
-// Create a layered bloom filter which will contain 3 layers of 100,000 items,
+// Create a layered bloom filter which will contain an expected 100,000 items,
 // and which allows a false positive rate of 1%.
-f := bloom.NewLayered(3, 100000, 0.01)
+f := bloom.NewLayered(100000, 0.01)
 
 // Add an item to the layered filter
 f.Add([]byte("foo"))
