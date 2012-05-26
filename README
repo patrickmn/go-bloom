@@ -60,4 +60,4 @@ f.Add([]byte("foo"))
 layer, found := f.Test([]byte("foo")
 layer == 1
 
-go-bloom is blased on bloom by William Fitzgerald.
+go-bloom is based on bloom by William Fitzgerald.
