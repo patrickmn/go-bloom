@@ -56,10 +56,9 @@ f.Add([]byte("foo"))
 // Add an item to the layered filter again
 f.Add([]byte("foo"))
 
-// Find the index of the deepest layer an item was added to, e.g. 2 for the
-// second layer.
-layer := f.Test([]byte("foo")
-layer == 2
+// Find out how many times an item appears in the bitset
+count := f.Test([]byte("foo")
+count == 2
 
 To use go-bloom in multiple goroutines, use a sync.RWMutex, and surround test
 calls with RLock()/RUnlock(), and set calls with Lock()/()Unlock.
