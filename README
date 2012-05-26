@@ -13,6 +13,11 @@ removed (though this can be addressed with a counting filter.)
 
 go get github.com/pmylund/go-bloom
 
+== Documentation
+
+go doc github.com/pmylund/go-bloom
+or http://go.pkgdoc.org/github.com/pmylund/go-bloom
+
 == Usage
 
 import "github.com/pmylund/go-bloom"
