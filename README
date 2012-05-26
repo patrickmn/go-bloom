@@ -4,9 +4,6 @@ occurrences of the same item.)
 
 All of the bloom filters use the 64-bit FNV-1a hash function.
 
-To use go-bloom in multiple goroutines, use a sync.RWMutex, and surround test
-calls with RLock()/RUnlock(), and set calls with Lock()/()Unlock.
-
 == Installation
 
 go get github.com/pmylund/go-bloom
@@ -59,5 +56,9 @@ f.Add([]byte("foo"))
 // second layer.
 layer, found := f.Test([]byte("foo")
 layer == 1
+
+To use go-bloom in multiple goroutines, use a sync.RWMutex, and surround test
+calls with RLock()/RUnlock(), and set calls with Lock()/()Unlock.
+
 
 go-bloom is based on bloom by William Fitzgerald.
