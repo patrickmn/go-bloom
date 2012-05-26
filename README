@@ -27,7 +27,7 @@ f.Add([]byte("foo"))
 
 // Check if an item has been added to the filter (if true, subject to the
 // false positive chance; if false, then the item definitely has not been
-// added to the filter.
+// added to the filter.)
 f.Test([]byte("foo"))
 
 
