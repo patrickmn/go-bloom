@@ -107,6 +107,7 @@ func (f *CountingFilter) Add(data []byte) {
 			if !ov.Test(v) {
 				done = true
 				ov.Set(v)
+				break
 			}
 		}
 		if !done {
