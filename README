@@ -1,8 +1,12 @@
 go-bloom is a collection of bloom filters for Go, including a standard bloom
 filter, a counting bloom filter, and a layered bloom filter (for counting
-occurrences of the same item.)
+occurrences of the same item.) All of them use the 64-bit FNV-1a hash function.
 
-All of the bloom filters use the 64-bit FNV-1a hash function.
+A bloom filter is a space-efficient probabilistic data structure that is used
+to test whether an element is a member of a set. False positives are possible,
+but false negatives are not; i.e. a query returns either "inside set (may be
+wrong)" or "definitely not in set". Elements can be added to the set, but not
+removed (though this can be addressed with a counting filter.)
 
 == Installation
 
