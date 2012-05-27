@@ -3,8 +3,8 @@ package bloom
 import (
 	"github.com/pmylund/go-bitset"
 
-	"encoding/binary"
 	"hash"
+	"hash/crc64"
 	"hash/fnv"
 	"math"
 )
@@ -19,12 +19,12 @@ type filter64 struct {
 func (f *filter64) bits(data []byte) []uint64 {
 	f.h.Reset()
 	f.h.Write(data)
-	d := f.h.Sum(nil)
+	a := f.h.Sum64()
+
 	f.oh.Reset()
 	f.oh.Write(data)
-	od := f.oh.Sum(nil)
-	a := binary.BigEndian.Uint64(d)
-	b := binary.BigEndian.Uint64(od)
+	b := f.oh.Sum64()
+
 	is := make([]uint64, f.k)
 	for i := uint64(0); i < f.k; i++ {
 		is[i] = (a + b*i) % f.m
@@ -32,12 +32,12 @@ func (f *filter64) bits(data []byte) []uint64 {
 	return is
 }
 
-func new64(m, k uint64) *filter64 {
+func newFilter64(m, k uint64) *filter64 {
 	return &filter64{
 		m:  m,
 		k:  k,
-		h:  fnv.New64a(),
-		oh: fnv.New64(),
+		h:  fnv.New64(),
+		oh: crc64.New(crc64.MakeTable(crc64.ECMA)),
 	}
 }
 
@@ -74,12 +74,17 @@ func (f *Filter64) Add(data []byte) {
 	}
 }
 
+// Resets the filter.
+func (f *Filter64) Reset() {
+	f.b.Reset()
+}
+
 // Create a bloom filter with an expected n number of items, and an acceptable
 // false positive rate of p, e.g. 0.01 for 1%.
 func New64(n int64, p float64) *Filter64 {
 	m, k := estimates64(uint64(n), p)
 	f := &Filter64{
-		new64(m, k),
+		newFilter64(m, k),
 		bitset.New64(m),
 	}
 	return f
@@ -140,13 +145,19 @@ func (f *CountingFilter64) Remove(data []byte) {
 	}
 }
 
+// Resets the filter.
+func (f *CountingFilter64) Reset() {
+	f.b = f.b[:1]
+	f.b[0].Reset()
+}
+
 // Create a counting bloom filter with an expected n number of items, and an
 // acceptable false positive rate of p. Counting bloom filters support
 // the removal of items from the filter.
 func NewCounting64(n int64, p float64) *CountingFilter64 {
 	m, k := estimates64(uint64(n), p)
 	f := &CountingFilter64{
-		new64(m, k),
+		newFilter64(m, k),
 		[]*bitset.Bitset64{bitset.New64(m)},
 	}
 	return f
@@ -211,6 +222,12 @@ func (f *LayeredFilter64) Add(data []byte) int {
 	return i + 2
 }
 
+// Resets the filter.
+func (f *LayeredFilter64) Reset() {
+	f.b = f.b[:1]
+	f.b[0].Reset()
+}
+
 // Create a layered bloom filter with an expected n number of items, and an
 // acceptable false positive rate of p. Layered bloom filters can be used
 // to keep track of a certain, arbitrary count of items, e.g. to check if some
@@ -218,7 +235,7 @@ func (f *LayeredFilter64) Add(data []byte) int {
 func NewLayered64(n int64, p float64) *LayeredFilter64 {
 	m, k := estimates64(uint64(n), p)
 	f := &LayeredFilter64{
-		new64(m, k),
+		newFilter64(m, k),
 		[]*bitset.Bitset64{bitset.New64(m)},
 	}
 	return f

@@ -20,8 +20,8 @@ func (f *filter) bits(data []byte) []uint32 {
 	f.h.Reset()
 	f.h.Write(data)
 	d := f.h.Sum(nil)
-	a := binary.BigEndian.Uint32(d[0:4])
-	b := binary.BigEndian.Uint32(d[4:8])
+	a := binary.BigEndian.Uint32(d[4:8])
+	b := binary.BigEndian.Uint32(d[0:4])
 	is := make([]uint32, f.k)
 	for i := uint32(0); i < f.k; i++ {
 		is[i] = (a + b*i) % f.m
@@ -29,11 +29,11 @@ func (f *filter) bits(data []byte) []uint32 {
 	return is
 }
 
-func new(m, k uint32) *filter {
+func newFilter(m, k uint32) *filter {
 	return &filter{
 		m: m,
 		k: k,
-		h: fnv.New64a(),
+		h: fnv.New64(),
 	}
 }
 
@@ -75,12 +75,17 @@ func (f *Filter) Add(data []byte) {
 	}
 }
 
+// Resets the filter.
+func (f *Filter) Reset() {
+	f.b.Reset()
+}
+
 // Create a bloom filter with an expected n number of items, and an acceptable
 // false positive rate of p, e.g. 0.01.
 func New(n int, p float64) *Filter {
 	m, k := estimates(uint32(n), p)
 	f := &Filter{
-		new(m, k),
+		newFilter(m, k),
 		bitset.New32(m),
 	}
 	return f
@@ -141,13 +146,19 @@ func (f *CountingFilter) Remove(data []byte) {
 	}
 }
 
+// Resets the filter.
+func (f *CountingFilter) Reset() {
+	f.b = f.b[:1]
+	f.b[0].Reset()
+}
+
 // Create a counting bloom filter with an expected n number of items, and an
 // acceptable false positive rate of p. Counting bloom filters support
 // the removal of items from the filter.
 func NewCounting(n int, p float64) *CountingFilter {
 	m, k := estimates(uint32(n), p)
 	f := &CountingFilter{
-		new(m, k),
+		newFilter(m, k),
 		[]*bitset.Bitset32{bitset.New32(m)},
 	}
 	return f
@@ -212,6 +223,12 @@ func (f *LayeredFilter) Add(data []byte) int {
 	return i + 2
 }
 
+// Resets the filter.
+func (f *LayeredFilter) Reset() {
+	f.b = f.b[:1]
+	f.b[0].Reset()
+}
+
 // Create a layered bloom filter with an expected n number of items, and an
 // acceptable false positive rate of p. Layered bloom filters can be used
 // to keep track of a certain, arbitrary count of items, e.g. to check if some
@@ -219,7 +236,7 @@ func (f *LayeredFilter) Add(data []byte) int {
 func NewLayered(n int, p float64) *LayeredFilter {
 	m, k := estimates(uint32(n), p)
 	f := &LayeredFilter{
-		new(m, k),
+		newFilter(m, k),
 		[]*bitset.Bitset32{bitset.New32(m)},
 	}
 	return f
