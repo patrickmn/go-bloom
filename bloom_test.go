@@ -147,7 +147,10 @@ func TestLayeredFilter(t *testing.T) {
 	}
 }
 
-const billion = 1000000000
+const (
+	million = 1000000
+	billion = 1000 * million
+)
 
 func TestSizePanic(t *testing.T) {
 	// Trying to create a bloom filter that requires a bitset slice with

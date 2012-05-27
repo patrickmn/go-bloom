@@ -45,7 +45,7 @@ func estimates(n uint32, p float64) (uint32, uint32) {
 
 	words := m + 31>>5
 	if words >= math.MaxInt32 {
-		panic(fmt.Sprintf("32-bit bloom filter with n %d and p %.2f requires a slice of %.2f 32-bit words, but slices cannot contain more than %d elements. Please use the equivalent 64-bit bloom filter, e.g. New64(), instead.", n, p, words, math.MaxInt32-1))
+		panic(fmt.Sprintf("A 32-bit bloom filter with n %d and p %f requires a slice of %f 32-bit words, but slices cannot contain more than %d elements. Please use the equivalent 64-bit bloom filter, e.g. New64(), instead.", n, p, words, math.MaxInt32-1))
 	}
 	return uint32(m), uint32(k)
 }
