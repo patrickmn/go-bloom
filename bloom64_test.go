@@ -5,13 +5,7 @@ import (
 	"testing"
 )
 
-var (
-	foo = []byte("foo")
-	bar = []byte("bar")
-	baz = []byte("baz")
-)
-
-func TestFilter(t *testing.T) {
+func TestFilter64(t *testing.T) {
 	f := New(3000, 0.01)
 	f.Add(foo)
 	f.Add(bar)
@@ -26,7 +20,7 @@ func TestFilter(t *testing.T) {
 	}
 }
 
-func TestCountingFilter(t *testing.T) {
+func TestCountingFilter64(t *testing.T) {
 	f := NewCounting(3000, 0.01)
 	f.Add(foo)
 	f.Add(foo)
@@ -40,7 +34,7 @@ func TestCountingFilter(t *testing.T) {
 	}
 }
 
-func TestLayeredFilter(t *testing.T) {
+func TestLayeredFilter64(t *testing.T) {
 	layers := 5
 	f := NewLayered(3000, 0.01)
 	for i := 0; i < layers; i++ {
@@ -53,22 +47,9 @@ func TestLayeredFilter(t *testing.T) {
 	}
 }
 
-const billion = 1000000000
-
-func TestSizePanic(t *testing.T) {
-	// Trying to create a bloom filter that requires a bitset slice with
-	// > MaxInt32 should cause a panic rather than silently overflow.
-	defer func() {
-		if x := recover(); x == nil {
-			t.Errorf("MaxInt32 word requirement should have caused a panic")
-		}
-	}()
-	New(2*billion, 0.01)
-}
-
-func BenchmarkFilterAdd(b *testing.B) {
+func BenchmarkFilterAdd64(b *testing.B) {
 	b.StopTimer()
-	f := New(b.N, 0.01)
+	f := New64(int64(b.N), 0.01)
 	datas := make([][]byte, b.N)
 	for i := range datas {
 		datas[i] = []byte(strconv.Itoa(i))
@@ -79,9 +60,9 @@ func BenchmarkFilterAdd(b *testing.B) {
 	}
 }
 
-func BenchmarkFilterAddExisting(b *testing.B) {
+func BenchmarkFilterAddExisting64(b *testing.B) {
 	b.StopTimer()
-	f := New(b.N, 0.01)
+	f := New64(int64(b.N), 0.01)
 	f.Add(foo)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
